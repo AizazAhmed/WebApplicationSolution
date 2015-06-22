@@ -102,7 +102,7 @@ namespace <#= Namespace #>
 foreach (Table tbl in from t in tables.Where(t => !t.IsMapping).OrderBy(x => x.NameHumanCase) select t)
 {
 #>
-        IDbSet<<#=tbl.NameHumanCase #>> <#=Inflector.MakePlural(tbl.NameHumanCase) #> { get; set; }<#if (IncludeComments)
+        DbSet<<#=tbl.NameHumanCase #>> <#=Inflector.MakePlural(tbl.NameHumanCase) #> { get; set; }<#if (IncludeComments)
 { #> // <#=tbl.Name #>
 <# }
 else
@@ -184,8 +184,10 @@ foreach (StoredProcedure sp in storedProcs)
 foreach(Table tbl in from t in tables.Where(t => !t.IsMapping).OrderBy(x => x.NameHumanCase) select t)
 {
 #>
-        public IDbSet<<#=tbl.NameHumanCase#>> <#=Inflector.MakePlural(tbl.NameHumanCase)#> { get; set; }<#if(IncludeComments){#> // <#=tbl.Name#>
+        public DbSet<<#=tbl.NameHumanCase#>> <#=Inflector.MakePlural(tbl.NameHumanCase)#> { get; set; }<#if(IncludeComments){#> // <#=tbl.Name#>
+
 <# } else { #>
+
 <# } #>
 <# } #>
         
@@ -302,7 +304,7 @@ foreach (StoredProcedure sp in storedProcs)
 foreach (Table tbl in from t in tables.Where(t => !t.IsMapping).OrderBy(x => x.NameHumanCase) select t)
 {
 #>
-        public IDbSet<<#=tbl.NameHumanCase #>> <#=Inflector.MakePlural(tbl.NameHumanCase) #> { get; set; }
+        public DbSet<<#=tbl.NameHumanCase #>> <#=Inflector.MakePlural(tbl.NameHumanCase) #> { get; set; }
 <# } #>
 
         public Fake<#=DbContextName #>()
@@ -315,18 +317,18 @@ foreach (Table tbl in from t in tables.Where(t => !t.IsMapping).OrderBy(x => x.N
 <# } #>
         }
 
-        public int SaveChanges()
+        public virtual int SaveChanges()
         {
             return 0;
         }
 <# if (IsSupportedFrameworkVersion("4.5")) { #>
 
-        public Task<int> SaveChangesAsync()
+        public virtual Task<int> SaveChangesAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        public virtual Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
@@ -351,7 +353,7 @@ foreach (StoredProcedure sp in storedProcs)
     if (sp.ReturnColumns.Count > 0)
     {
         string spReturnClassName = WriteStoredProcReturnModelName(sp); #>
-        public List<<#= spReturnClassName #>> <#= spExecName #>(<#=WriteStoredProcFunctionParams(sp)#>)
+        public virtual List<<#= spReturnClassName #>> <#= spExecName #>(<#=WriteStoredProcFunctionParams(sp)#>)
         {
 <#= WriteStoredProcFunctionSetSqlParameters(sp, true) #> 
             procResult = 0;
@@ -359,7 +361,7 @@ foreach (StoredProcedure sp in storedProcs)
         }
 
 <# } else { #>
-        public int <#= spExecName #>(<#=WriteStoredProcFunctionParams(sp)#>)
+        public virtual int <#= spExecName #>(<#=WriteStoredProcFunctionParams(sp)#>)
         {
 <#= WriteStoredProcFunctionSetSqlParameters(sp, true) #> 
             return 0;
@@ -376,7 +378,7 @@ foreach (StoredProcedure sp in storedProcs)
     // Fake DbSet
 <# } #>
     <#= CodeGeneratedAttribute #>
-    public class FakeDbSet<T> : IDbSet<T> where T : class
+    public class FakeDbSet<T> : DbSet<T>, IQueryable<T> where T : class
     {
         private readonly HashSet<T> _data;
 
@@ -385,24 +387,48 @@ foreach (StoredProcedure sp in storedProcs)
             _data = new HashSet<T>();
         }
 
-        public virtual T Find(params object[] keyValues)
+        public override T Find(params object[] keyValues)
         {
             throw new NotImplementedException();
         }
 
-        public T Add(T item)
+        public override T Add(T item)
         {
             _data.Add(item);
             return item;
         }
+<# if (IsSupportedFrameworkVersion("4.5")) { #>
 
-        public T Remove(T item)
+        public override Task<T> FindAsync(params object[] keyValues)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<T> FindAsync(CancellationToken cancellationToken, params object[] keyValues)
+        {
+            throw new NotImplementedException();
+        }
+<# } #>
+
+        public override IEnumerable<T> AddRange(IEnumerable<T> items)
+        {
+            items.ToList().ForEach(e => _data.Add(e));
+            return items;
+        }
+
+        public override T Remove(T item)
         {
             _data.Remove(item);
             return item;
         }
 
-        public T Attach(T item)
+        public override IEnumerable<T> RemoveRange(IEnumerable<T> items)
+        {
+            _data.RemoveWhere(items.Contains);
+            return items;
+        }
+
+        public override T Attach(T item)
         {
             _data.Add(item);
             return item;
@@ -438,12 +464,12 @@ foreach (StoredProcedure sp in storedProcs)
             return _data.GetEnumerator();
         }
 
-        public T Create()
+        public override T Create()
         {
             return Activator.CreateInstance<T>();
         }
 
-        public ObservableCollection<T> Local
+        public override ObservableCollection<T> Local
         {
             get
             {
@@ -451,7 +477,7 @@ foreach (StoredProcedure sp in storedProcs)
             }
         }
 
-        public TDerivedEntity Create<TDerivedEntity>() where TDerivedEntity : class, T
+        public override TDerivedEntity Create<TDerivedEntity>()
         {
             return Activator.CreateInstance<TDerivedEntity>();
         }
