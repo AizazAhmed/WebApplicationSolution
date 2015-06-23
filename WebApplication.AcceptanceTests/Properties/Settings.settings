@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="WebConfigFilePath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">..\..\..\.vs\config\applicationhost.config</Value>
+      <Value Profile="(Default)">..\..\applicationhost.config</Value>
     </Setting>
     <Setting Name="SiteName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">WebApplication</Value>

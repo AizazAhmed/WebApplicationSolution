@@ -25,7 +25,7 @@ namespace WebApplication.AcceptanceTests.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\.vs\\config\\applicationhost.config")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\applicationhost.config")]
         public string WebConfigFilePath {
             get {
                 return ((string)(this["WebConfigFilePath"]));
