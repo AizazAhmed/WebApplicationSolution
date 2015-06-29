@@ -2,6 +2,8 @@ namespace WebApplication.AcceptanceTests
 {
     using System;
     using System.Net.Http;
+    using System.Threading.Tasks;
+    using Properties;
     using TechTalk.SpecFlow;
 
     [Binding]
@@ -33,14 +35,19 @@ namespace WebApplication.AcceptanceTests
         {
             try
             {
-                var client = GetClient();
-                client.Timeout = TimeSpan.FromSeconds(30);
-                var result = client.GetAsync("").Result;
+                BrowseToBaseAddress().Wait();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
+        }
+
+        static Task BrowseToBaseAddress()
+        {
+            var client = GetClient();
+            client.Timeout = Settings.Default.EnvironmentSetupTimeout;
+            return client.GetAsync("");
         }
     }
 }

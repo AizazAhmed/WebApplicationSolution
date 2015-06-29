@@ -1,0 +1,24 @@
+version: 1.0.{build}
+os: Visual Studio 2015 RC
+clone_depth: 1
+install:
+- set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+cache: packages -> **\packages.config
+before_build:
+- nuget restore
+build:
+  publish_wap: true
+  publish_nuget: true
+  verbosity: minimal
+before_test:
+- '"C:\Program Files (x86)\Microsoft SQL Server\120\DAC\bin\SqlPackage.exe" /Action:Publish /SourceFile:Database\bin\Debug\Database.dacpac /TargetConnectionString:"Data Source=(localdb)\mssqllocaldb;Integrated Security=True;Pooling=False;Initial Catalog=Database1"'
+test:
+  assemblies: '**\*Tests.dll'
+artifacts:
+- path: WebApplication\bin
+- path: WebApplication.UnitTests\bin
+- path: WebApplication.IntegrationTests\bin
+- path: WebApplication.AcceptanceTests\bin
+- path: Database
+on_failure:
+- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
