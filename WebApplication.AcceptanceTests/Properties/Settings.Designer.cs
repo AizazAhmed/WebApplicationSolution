@@ -25,19 +25,19 @@ namespace WebApplication.AcceptanceTests.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\applicationhost.config")]
-        public string WebConfigFilePath {
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\..\\WebApplication")]
+        public string PhysicalPath {
             get {
-                return ((string)(this["WebConfigFilePath"]));
+                return ((string)(this["PhysicalPath"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("WebApplication")]
-        public string SiteName {
+        [global::System.Configuration.DefaultSettingValueAttribute("8080")]
+        public int Port {
             get {
-                return ((string)(this["SiteName"]));
+                return ((int)(this["Port"]));
             }
         }
     }

@@ -1,27 +1,27 @@
 namespace WebApplication.AcceptanceTests
 {
     using System;
+    using System.IO;
     using System.Net.Http;
-    using System.Xml;
-    using System.Xml.Linq;
-    using System.Xml.XPath;
     using IISExpressBootstrapper;
     using Properties;
 
     class WebApplication : IDisposable
     {
-        readonly ConfigFileParameters parameters;
+        readonly PathParameters parameters;
         IDisposable host;
         string baseAddress;
 
         public WebApplication()
-            : this(Settings.Default.WebConfigFilePath, Settings.Default.SiteName)
+            : this(FullPath, Settings.Default.Port)
         { }
 
-        public WebApplication(string configFile, string siteName)
+        public WebApplication(string path, int port)
         {
-            parameters = new ConfigFileParameters {ConfigFile = configFile, SiteName = siteName};
+            parameters = new PathParameters { Path = path, Port = port};
         }
+
+        static string FullPath => Path.GetFullPath(Settings.Default.PhysicalPath);
 
         public void Start()
         {
@@ -57,15 +57,7 @@ namespace WebApplication.AcceptanceTests
 
         string GetBaseAddressCore()
         {
-            using (var reader = XmlReader.Create(parameters.ConfigFile))
-            {
-                var doc = XDocument.Load(reader);
-                var bindingInfo = doc.XPathEvaluate("string(/configuration/system.applicationHost/sites/site" +
-                                                    $"[@name='{parameters.SiteName}']/bindings/binding[@protocol='http']" +
-                                                    "/@bindingInformation)") as string;
-                var parts = bindingInfo?.Split(':') ?? new string[3];
-                return $"http://{parts[2]}:{parts[1]}";
-            }
+            return $"http://localhost:{parameters.Port}";
         }
     }
 }
