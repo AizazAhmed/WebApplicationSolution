@@ -15,6 +15,9 @@
         {
             application = new WebApplication();
             application.Start();
+
+            // TODO remove this
+            System.Threading.Thread.Sleep(System.TimeSpan.FromMinutes(5));
         }
 
         [When(@"I navigate to '(.*)'")]
