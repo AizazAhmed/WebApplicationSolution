@@ -30,7 +30,7 @@ namespace WebApplication.AcceptanceTests
 
         public HttpClient GetClient()
         {
-            var client = new HttpClient { BaseAddress = new Uri(GetBaseAddress()) };
+            var client = new HttpClient { BaseAddress = new Uri($"http://localhost:{parameters.Port}") };
             return client;
         }
 
@@ -44,20 +44,6 @@ namespace WebApplication.AcceptanceTests
             {
                 // Do nothing
             }
-        }
-
-        string GetBaseAddress()
-        {
-            if (baseAddress == null)
-            {
-                baseAddress = GetBaseAddressCore();
-            }
-            return baseAddress;
-        }
-
-        string GetBaseAddressCore()
-        {
-            return $"http://localhost:{parameters.Port}";
         }
     }
 }

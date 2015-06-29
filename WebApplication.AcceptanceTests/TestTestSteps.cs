@@ -1,29 +1,27 @@
 ﻿namespace WebApplication.AcceptanceTests
 {
     using System.Net;
+    using System.Net.Http;
     using FluentAssertions;
     using TechTalk.SpecFlow;
 
     [Binding]
     public class TestTestSteps
     {
-        WebApplication application;
         HttpStatusCode statusCode;
 
         [Given(@"the application is running")]
         public void GivenTheApplicationIsRunning()
         {
-            application = new WebApplication();
-            application.Start();
-
-            // TODO remove this
-            System.Threading.Thread.Sleep(System.TimeSpan.FromMinutes(5));
+            var client = GetClient();
+            // Smoke test
+            client.GetAsync("").Result.EnsureSuccessStatusCode();
         }
 
         [When(@"I navigate to '(.*)'")]
         public void WhenINavigateTo(string resource)
         {
-            var client = application.GetClient();
+            var client = GetClient();
             var responseMessage = client.GetAsync(resource).Result;
             statusCode = responseMessage.StatusCode;
         }
@@ -34,10 +32,9 @@
             statusCode.Should().Be(expected);
         }
 
-        [AfterScenario]
-        public void CleanUp()
+        static HttpClient GetClient()
         {
-            application?.Dispose();
+            return Environment.GetClient();
         }
     }
 }
