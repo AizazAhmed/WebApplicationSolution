@@ -2,7 +2,7 @@ namespace WebApplication.AcceptanceTests
 {
     using System;
     using System.Net.Http;
-    using System.Threading.Tasks;
+    using System.Threading;
     using Properties;
     using TechTalk.SpecFlow;
 
@@ -33,21 +33,18 @@ namespace WebApplication.AcceptanceTests
 
         static void WaitForTheServerToStart()
         {
-            try
+            if (string.Equals(System.Environment.GetEnvironmentVariable("TestEnvironment"), "CI", StringComparison.Ordinal))
             {
-                BrowseToBaseAddress().Wait();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+                WaitForContinuousIntegrationEnvironment();
             }
         }
 
-        static Task BrowseToBaseAddress()
+        static void WaitForContinuousIntegrationEnvironment()
         {
-            var client = GetClient();
-            client.Timeout = Settings.Default.EnvironmentSetupTimeout;
-            return client.GetAsync("");
+            var timeout = Settings.Default.ContinuousIntegrationEnvironmentSetupTimeout;
+            Console.WriteLine($"Pausing for {timeout.TotalSeconds} seconds to allow the server to start.");
+            Thread.Sleep(timeout);
+            Console.WriteLine("Continuing with the test run.");
         }
     }
 }
