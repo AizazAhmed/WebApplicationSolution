@@ -10,7 +10,6 @@ namespace WebApplication.AcceptanceTests
     {
         readonly PathParameters parameters;
         IDisposable host;
-        string baseAddress;
 
         public WebApplication()
             : this(FullPath, Settings.Default.Port)

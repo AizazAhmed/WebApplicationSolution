@@ -43,7 +43,7 @@ namespace WebApplication.AcceptanceTests.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:01:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:02:00")]
         public global::System.TimeSpan EnvironmentSetupTimeout {
             get {
                 return ((global::System.TimeSpan)(this["EnvironmentSetupTimeout"]));
